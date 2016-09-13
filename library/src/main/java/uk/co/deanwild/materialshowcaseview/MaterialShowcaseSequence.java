@@ -113,9 +113,13 @@ public class MaterialShowcaseSequence implements IDetachedListener {
         if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing()) {
             MaterialShowcaseView sequenceItem = mShowcaseQueue.remove();
             sequenceItem.setDetachedListener(this);
-            sequenceItem.show(mActivity);
-            if (mOnItemShownListener != null) {
-                mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
+            if (sequenceItem.show(mActivity)) {
+                if (mOnItemShownListener != null) {
+                    mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
+                }
+            } else {
+                sequenceItem.setDetachedListener(null);
+                showNextItem();
             }
         } else {
             /**

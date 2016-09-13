@@ -82,4 +82,8 @@ public class RectangleShape implements Shape {
     public int getHeight() {
         return height;
     }
+
+    protected Rect getRect() {
+        return rect;
+    }
 }
