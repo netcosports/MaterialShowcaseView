@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private TextView mTitleTextView;
     private TextView mContentTextView;
     private TextView mDismissButton;
+    private ImageView mIcon;
     private int mGravity;
     private int mContentBottomMargin;
     private int mContentTopMargin;
@@ -103,7 +106,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
     private void init(Context context) {
         setWillNotDraw(false);
-
+        setId(R.id.showcase_container);
         // create our animation factory
         mAnimationFactory = new AnimationFactory();
 
@@ -125,6 +128,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mTitleTextView = (TextView) contentView.findViewById(R.id.tv_title);
         mContentTextView = (TextView) contentView.findViewById(R.id.tv_content);
         mDismissButton = (TextView) contentView.findViewById(R.id.tv_dismiss);
+        mIcon = (ImageView) contentView.findViewById(R.id.tv_icon);
         mDismissButton.setOnClickListener(this);
     }
 
@@ -400,6 +404,18 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
     }
 
+    private void setIcon(int iconResId) {
+        if (mIcon != null) {
+            mIcon.setImageResource(iconResId);
+        }
+    }
+
+    private void setIcon(Drawable drawable) {
+        if (mIcon != null) {
+            mIcon.setImageDrawable(drawable);
+        }
+    }
+
     private void setShapePadding(int padding) {
         mShapePadding = padding;
     }
@@ -554,6 +570,22 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
 
         /**
+         * Set the icon shown above title.
+         */
+        public Builder setIcon(int iconRes) {
+            showcaseView.setIcon(iconRes);
+            return this;
+        }
+
+        /**
+         * Set the icon shown above title.
+         */
+        public Builder setIcon(Drawable icon) {
+            showcaseView.setIcon(icon);
+            return this;
+        }
+
+        /**
          * Set the title text shown on the ShowcaseView.
          */
         public Builder setTitleText(int resId) {
@@ -595,6 +627,17 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         public Builder setMaskColour(int maskColour) {
             showcaseView.setMaskColour(maskColour);
+            return this;
+        }
+
+        public Builder setMaskColourResId(int maskColourResId) {
+            int color;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                color = activity.getColor(maskColourResId);
+            } else {
+                color = activity.getResources().getColor(maskColourResId);
+            }
+            showcaseView.setMaskColour(color);
             return this;
         }
 
@@ -834,6 +877,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
      */
     public static void resetAll(Context context) {
         PrefsManager.resetAll(context);
+    }
+
+    public static boolean isShowing(Activity activity) {
+        return activity.findViewById(R.id.showcase_container) != null;
     }
 
     public static int getSoftButtonsBarSizePort(Activity activity) {

@@ -1,6 +1,7 @@
 package uk.co.deanwild.materialshowcaseview;
 
 import android.app.Activity;
+import android.util.Pair;
 import android.view.View;
 
 import java.util.LinkedList;
@@ -9,8 +10,15 @@ import java.util.Queue;
 
 public class MaterialShowcaseSequence implements IDetachedListener {
 
+    private static final ShowcaseViewPredicate DEFAULT_PREDICATE = new ShowcaseViewPredicate() {
+        @Override
+        public boolean apply(MaterialShowcaseView view) {
+            return true;
+        }
+    };
+
     PrefsManager mPrefsManager;
-    Queue<MaterialShowcaseView> mShowcaseQueue;
+    Queue<Pair<MaterialShowcaseView, ShowcaseViewPredicate>> mShowcaseQueue;
     private boolean mSingleUse = false;
     Activity mActivity;
     private ShowcaseConfig mConfig;
@@ -47,12 +55,19 @@ public class MaterialShowcaseSequence implements IDetachedListener {
             sequenceItem.setConfig(mConfig);
         }
 
-        mShowcaseQueue.add(sequenceItem);
-        return this;
+        return addSequenceItem(sequenceItem, DEFAULT_PREDICATE);
     }
 
     public MaterialShowcaseSequence addSequenceItem(MaterialShowcaseView sequenceItem) {
-        mShowcaseQueue.add(sequenceItem);
+        return addSequenceItem(sequenceItem, DEFAULT_PREDICATE);
+    }
+
+    public MaterialShowcaseSequence addSequenceItem(MaterialShowcaseView sequenceItem, ShowcaseViewPredicate predicate) {
+        if (predicate == null) {
+            predicate = DEFAULT_PREDICATE;
+        }
+
+        mShowcaseQueue.add(Pair.create(sequenceItem, predicate));
         return this;
     }
 
@@ -111,9 +126,10 @@ public class MaterialShowcaseSequence implements IDetachedListener {
     private void showNextItem() {
 
         if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing()) {
-            MaterialShowcaseView sequenceItem = mShowcaseQueue.remove();
+            Pair<MaterialShowcaseView, ShowcaseViewPredicate> pair = mShowcaseQueue.remove();
+            MaterialShowcaseView sequenceItem = pair.first;
             sequenceItem.setDetachedListener(this);
-            if (sequenceItem.show(mActivity)) {
+            if (pair.second.apply(sequenceItem) && sequenceItem.show(mActivity)) {
                 if (mOnItemShownListener != null) {
                     mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
                 }
@@ -170,4 +186,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
         void onDismiss(MaterialShowcaseView itemView, int position);
     }
 
+    public interface ShowcaseViewPredicate {
+        boolean apply(MaterialShowcaseView view);
+    }
 }
