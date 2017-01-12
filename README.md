@@ -15,7 +15,7 @@ Since Google introduced the Material design philosophy I have seen quite a few a
 
 NecoRepo
 
-Add the jitpack repo to your your project's build.gradle at the end of repositories [Why?](#why-jitpack)
+Add the netco repo to your your project's build.gradle at the end of repositories
 
 /build.gradle
 ```groovy
