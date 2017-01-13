@@ -37,7 +37,7 @@ Then add the dependency to your module's build.gradle:
 
 /app/build.gradle
 ```groovy
-compile 'com.netcosports.materialshowcase:showcase-view:1.0.0'
+compile 'com.netcosports.materialshowcase:showcase-view:1.0.1'
 ```
 
 
