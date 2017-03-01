@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -81,29 +82,39 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private boolean mTargetTouchable = false;
     private boolean mDismissOnTargetTouch = true;
 
+    private int outlineColor = Color.TRANSPARENT;
+
+    private Paint outlinePaint;
+
     public MaterialShowcaseView(Context context) {
         super(context);
-        init(context);
+        init(R.layout.showcase_content);
     }
+
+    private MaterialShowcaseView(Context context, int customLayoutId) {
+        super(context);
+        init(customLayoutId);
+    }
+
 
     public MaterialShowcaseView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(R.layout.showcase_content);
     }
 
     public MaterialShowcaseView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(R.layout.showcase_content);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public MaterialShowcaseView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
+        init(R.layout.showcase_content);
     }
 
 
-    private void init(Context context) {
+    private void init(int customLayoutId) {
         setWillNotDraw(false);
         setId(R.id.showcase_container);
         // create our animation factory
@@ -122,13 +133,23 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         setVisibility(INVISIBLE);
 
 
-        View contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
+        View contentView = LayoutInflater.from(getContext()).inflate(customLayoutId, this, true);
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = (TextView) contentView.findViewById(R.id.tv_title);
         mContentTextView = (TextView) contentView.findViewById(R.id.tv_content);
         mDismissButton = (TextView) contentView.findViewById(R.id.tv_dismiss);
         mIcon = (ImageView) contentView.findViewById(R.id.tv_icon);
         mDismissButton.setOnClickListener(this);
+
+
+
+        float outlineWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1,
+                getResources().getDisplayMetrics());
+
+        outlinePaint = new Paint();
+        outlinePaint.setStyle(Paint.Style.STROKE);
+        outlinePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        outlinePaint.setStrokeWidth(outlineWidth);
     }
 
 
@@ -183,6 +204,11 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         // draw (erase) shape
         mShape.draw(mCanvas, mEraser, mXPosition, mYPosition, mShapePadding);
+
+
+        if (outlineColor != Color.TRANSPARENT) {
+            mShape.draw(mCanvas, outlinePaint, mXPosition, mYPosition, mShapePadding);
+        }
 
         // Draw the bitmap on our views  canvas.
         canvas.drawBitmap(mBitmap, 0, 0, null);
@@ -415,6 +441,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
     }
 
+    private void setOutlineColor(int color) {
+        outlineColor = color;
+    }
+
     private void setShapePadding(int padding) {
         mShapePadding = padding;
     }
@@ -533,6 +563,11 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             showcaseView = new MaterialShowcaseView(activity);
         }
 
+        public Builder(Activity activity, int customLayoutId) {
+            this.activity = activity;
+            showcaseView = new MaterialShowcaseView(activity, customLayoutId);
+        }
+
         /**
          * Set the title text shown on the ShowcaseView.
          */
@@ -553,6 +588,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             return this;
         }
 
+        public Builder setOutlineColor(int color) {
+            showcaseView.setOutlineColor(color);
+            return this;
+        }
         /**
          * Set the content text shown on the ShowcaseView.
          */
