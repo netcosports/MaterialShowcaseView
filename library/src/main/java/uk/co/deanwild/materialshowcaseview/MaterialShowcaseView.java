@@ -317,17 +317,17 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             Rect targetBounds = mTarget.getBounds();
             setPosition(targetPoint);
 
+            int radius = Math.max(targetBounds.height(), targetBounds.width()) / 2;
+            if (mShape != null) {
+                mShape.updateTarget(mTarget);
+                radius = mShape.getHeight() / 2;
+            }
+
             // now figure out whether to put content above or below it
             if (!mShowTipsAlwaysOnTop) {
                 int height = getMeasuredHeight();
                 int midPoint = height / 2;
                 int yPos = targetPoint.y;
-
-                int radius = Math.max(targetBounds.height(), targetBounds.width()) / 2;
-                if (mShape != null) {
-                    mShape.updateTarget(mTarget);
-                    radius = mShape.getHeight() / 2;
-                }
 
                 if (yPos > midPoint) {
                     // target is in lower half of screen, we'll sit above it
