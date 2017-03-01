@@ -81,6 +81,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private IDetachedListener mDetachedListener;
     private boolean mTargetTouchable = false;
     private boolean mDismissOnTargetTouch = true;
+    private boolean mShowTipsAlwaysOnTop;
 
     private int outlineColor = Color.TRANSPARENT;
 
@@ -317,33 +318,39 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             setPosition(targetPoint);
 
             // now figure out whether to put content above or below it
-            int height = getMeasuredHeight();
-            int midPoint = height / 2;
-            int yPos = targetPoint.y;
+            if (!mShowTipsAlwaysOnTop) {
+                int height = getMeasuredHeight();
+                int midPoint = height / 2;
+                int yPos = targetPoint.y;
 
-            int radius = Math.max(targetBounds.height(), targetBounds.width()) / 2;
-            if (mShape != null) {
-                mShape.updateTarget(mTarget);
-                radius = mShape.getHeight() / 2;
-            }
-
-            if (yPos > midPoint) {
-                // target is in lower half of screen, we'll sit above it
-                mContentTopMargin = 0;
-                mContentBottomMargin = (height - yPos) + radius + mShapePadding;
-
-                mGravity = Gravity.BOTTOM;
-                if (mContentBox.getMeasuredHeight() > getMeasuredHeight() - mContentBottomMargin) {
-                    mGravity = Gravity.TOP;
-                    mContentBottomMargin = 0;
+                int radius = Math.max(targetBounds.height(), targetBounds.width()) / 2;
+                if (mShape != null) {
+                    mShape.updateTarget(mTarget);
+                    radius = mShape.getHeight() / 2;
                 }
 
-            } else {
-                // target is in upper half of screen, we'll sit below it
-                mContentTopMargin = yPos + radius + mShapePadding;
-                mContentBottomMargin = 0;
-                mGravity = Gravity.TOP;
+                if (yPos > midPoint) {
+                    // target is in lower half of screen, we'll sit above it
+                    mContentTopMargin = 0;
+                    mContentBottomMargin = (height - yPos) + radius + mShapePadding;
+
+                    mGravity = Gravity.BOTTOM;
+                    if (mContentBox.getMeasuredHeight() > getMeasuredHeight() - mContentBottomMargin) {
+                        mGravity = Gravity.TOP;
+                        mContentBottomMargin = 0;
+                    }
+
+                } else {
+                    // target is in upper half of screen, we'll sit below it
+                    mContentTopMargin = yPos + radius + mShapePadding;
+                    mContentBottomMargin = 0;
+                    mGravity = Gravity.TOP;
+                }
             }
+        } else {
+            mContentTopMargin = 0;
+            mContentBottomMargin = 0;
+            mGravity = Gravity.TOP;
         }
 
         applyLayoutParams();
@@ -402,6 +409,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         if (mContentTextView != null) {
             mContentTextView.setText(contentText);
         }
+    }
+
+    private void setShowTipsAlwaysOnTop(boolean value) {
+        mShowTipsAlwaysOnTop = value;
     }
 
     private void setDismissText(CharSequence dismissText) {
@@ -605,6 +616,14 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
          */
         public Builder setContentText(CharSequence text) {
             showcaseView.setContentText(text);
+            return this;
+        }
+
+        /**
+         * <p>True</p> means that cantent of tutorial is always shows at the top of screen.
+         */
+        public Builder setShowAlwaysOnTop(boolean value) {
+            showcaseView.setShowTipsAlwaysOnTop(value);
             return this;
         }
 
