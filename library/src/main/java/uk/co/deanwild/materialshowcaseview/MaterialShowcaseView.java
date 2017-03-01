@@ -207,6 +207,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
 
         if (outlineColor != Color.TRANSPARENT) {
+            outlinePaint.setColor(outlineColor);
             mShape.draw(mCanvas, outlinePaint, mXPosition, mYPosition, mShapePadding);
         }
 
