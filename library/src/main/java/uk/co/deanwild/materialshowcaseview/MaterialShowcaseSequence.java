@@ -26,6 +26,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
     private OnSequenceItemShownListener mOnItemShownListener = null;
     private OnSequenceItemDismissedListener mOnItemDismissedListener = null;
+    private OnSequenceFinishedListener mOnSequenceFinishedListener;
 
     public MaterialShowcaseSequence(Activity activity) {
         mActivity = activity;
@@ -83,6 +84,10 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
     public void setOnItemDismissedListener(OnSequenceItemDismissedListener listener) {
         this.mOnItemDismissedListener = listener;
+    }
+
+    public void setOnSequenceFinishedListener(OnSequenceFinishedListener onSequenceFinishedListener) {
+        this.mOnSequenceFinishedListener = onSequenceFinishedListener;
     }
 
     public boolean hasFired() {
@@ -144,6 +149,10 @@ public class MaterialShowcaseSequence implements IDetachedListener {
             if (mSingleUse) {
                 mPrefsManager.setFired();
             }
+
+            if (mOnSequenceFinishedListener != null) {
+                mOnSequenceFinishedListener.onSequenceFinished();
+            }
         }
     }
 
@@ -188,5 +197,9 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
     public interface ShowcaseViewPredicate {
         boolean apply(MaterialShowcaseView view);
+    }
+
+    public interface OnSequenceFinishedListener {
+        void onSequenceFinished();
     }
 }

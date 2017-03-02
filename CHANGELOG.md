@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## Version 1.0.6
+_2017-03-02_
+
+ *  Added OnSequenceFinishedListener.
+
 ## Version 1.0.4-5
 _2017-03-01_
 
