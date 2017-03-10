@@ -2,4 +2,5 @@
 <resources>
     <item name="showcase_container" type="id"/>
     <item name="tv_icon" type="id"/>
+    <item name="tv_skip" type="id"/>
 </resources>

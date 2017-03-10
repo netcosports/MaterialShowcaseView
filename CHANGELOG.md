@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## Version 1.0.7
+_2017-03-10_
+
+ *  Added possibility to skip sequence.
+
 ## Version 1.0.6
 _2017-03-02_
 

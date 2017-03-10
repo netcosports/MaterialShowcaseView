@@ -60,6 +60,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private TextView mTitleTextView;
     private TextView mContentTextView;
     private TextView mDismissButton;
+    private TextView mSkipButton;
     private ImageView mIcon;
     private int mGravity;
     private int mContentBottomMargin;
@@ -86,6 +87,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private int outlineColor = Color.TRANSPARENT;
 
     private Paint outlinePaint;
+    private boolean isSkipClicked;
 
     public MaterialShowcaseView(Context context) {
         super(context);
@@ -138,9 +140,18 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = (TextView) contentView.findViewById(R.id.tv_title);
         mContentTextView = (TextView) contentView.findViewById(R.id.tv_content);
+
         mDismissButton = (TextView) contentView.findViewById(R.id.tv_dismiss);
-        mIcon = (ImageView) contentView.findViewById(R.id.tv_icon);
         mDismissButton.setOnClickListener(this);
+
+        mSkipButton = (TextView) contentView.findViewById(R.id.tv_skip);
+        if (mSkipButton != null) {
+            mSkipButton.setOnClickListener(this);
+            mSkipButton.setVisibility(View.GONE);
+        }
+
+        mIcon = (ImageView) contentView.findViewById(R.id.tv_icon);
+
 
 
 
@@ -277,12 +288,16 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     }
 
     /**
-     * Dismiss button clicked
+     * Click listener for dissmiss and skip buttons.
      *
      * @param v
      */
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.tv_skip) {
+            isSkipClicked = true;
+        }
+
         hide();
     }
 
@@ -453,6 +468,18 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
     }
 
+    private void setSkipEnabled(boolean enabled) {
+        if (mSkipButton != null) {
+            mSkipButton.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void setSkipButtonText(CharSequence charSequence) {
+        if (mSkipButton != null) {
+            mSkipButton.setText(charSequence);
+        }
+    }
+
     private void setOutlineColor(int color) {
         outlineColor = color;
     }
@@ -537,8 +564,16 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
     }
 
+    public boolean isSkipped() {
+        return isSkipClicked;
+    }
+
     public boolean hasFired() {
         return mPrefsManager.hasFired();
+    }
+
+    public void setFired() {
+        mPrefsManager.setFired();
     }
 
     /**
@@ -632,6 +667,26 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
          */
         public Builder setIcon(int iconRes) {
             showcaseView.setIcon(iconRes);
+            return this;
+        }
+
+        /**
+         * Enable skip button.
+         * @param enabled
+         * @return
+         */
+        public Builder setSkipEnabled(boolean enabled) {
+            showcaseView.setSkipEnabled(enabled);
+            return this;
+        }
+
+        /**
+         * Sets skip button text.
+         * @param text
+         * @return
+         */
+        public Builder setSkipText(CharSequence text) {
+            showcaseView.setSkipButtonText(text);
             return this;
         }
 

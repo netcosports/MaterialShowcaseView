@@ -28,6 +28,8 @@ public class MaterialShowcaseSequence implements IDetachedListener {
     private OnSequenceItemDismissedListener mOnItemDismissedListener = null;
     private OnSequenceFinishedListener mOnSequenceFinishedListener;
 
+    private boolean skipSequence;
+
     public MaterialShowcaseSequence(Activity activity) {
         mActivity = activity;
         mShowcaseQueue = new LinkedList<>();
@@ -129,18 +131,22 @@ public class MaterialShowcaseSequence implements IDetachedListener {
     }
 
     private void showNextItem() {
-
         if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing()) {
             Pair<MaterialShowcaseView, ShowcaseViewPredicate> pair = mShowcaseQueue.remove();
             MaterialShowcaseView sequenceItem = pair.first;
-            sequenceItem.setDetachedListener(this);
-            if (pair.second.apply(sequenceItem) && sequenceItem.show(mActivity)) {
-                if (mOnItemShownListener != null) {
-                    mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
-                }
-            } else {
-                sequenceItem.setDetachedListener(null);
+            if (skipSequence) {
+                sequenceItem.setFired();
                 showNextItem();
+            } else {
+                sequenceItem.setDetachedListener(this);
+                if (pair.second.apply(sequenceItem) && sequenceItem.show(mActivity)) {
+                    if (mOnItemShownListener != null) {
+                        mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
+                    }
+                } else {
+                    sequenceItem.setDetachedListener(null);
+                    showNextItem();
+                }
             }
         } else {
             /**
@@ -179,6 +185,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
                 mPrefsManager.setSequenceStatus(mSequencePosition);
             }
 
+            skipSequence = showcaseView.isSkipped();
             showNextItem();
         }
     }
